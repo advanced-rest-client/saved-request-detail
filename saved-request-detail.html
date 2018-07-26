@@ -11,56 +11,20 @@ WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 License for the specific language governing permissions and limitations under
 the License.
 -->
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/legacy/class.html">
+<link rel="import" href="../polymer/lib/utils/render-status.html">
 <link rel="import" href="../http-method-label/http-method-label.html">
 <link rel="import" href="../date-time/date-time.html">
-<link rel="import" href="../arc-models/project-model.html">
-<link rel="import" href="../arc-models/request-model.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
-<link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../marked-element/marked-element.html">
 <link rel="import" href="../markdown-styles/markdown-styles.html">
-<!--
-Details applet for saved request object.
 
-If the request is a history item the set `isHistory` property to `true`.
-
-The applet doesn't support data edit. Element / app hosting this element
-must handle events sent by this element and support edit action.
-
-### Example
-```
-<saved-request-detail request="{...}"></saved-request-detail>
-```
-
-### Styling
-`<saved-request-detail>` provides the following custom properties and mixins for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-`--saved-request-detail` | Mixin applied to the element | `{}`
-`--saved-request-detail-description` | Mixin applied to request description | `{}`
-`--saved-request-detail-description-max-width` | Max width of the description element | `700px`
-`--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`
-`--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
-`--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
-`--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
-`--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`
-`--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`
-`--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
-`--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
-`--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
-`--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`
-
-@group UI Elements
-@element saved-request-detail
-@demo demo/index.html
--->
 <dom-module id="saved-request-detail">
   <template>
     <style include="markdown-styles"></style>
@@ -182,32 +146,162 @@ Custom property | Description | Default
         </div>
         <div class="value">
           [[_project.name]]
-          <span>
-            <paper-icon-button icon="arc:chevron-right" on-tap="_openProject" data-action="open-project"></paper-icon-button>
-            <paper-tooltip>Open project details</paper-tooltip>
-          </span>
+          <paper-icon-button icon="arc:chevron-right" on-tap="_openProject" data-action="open-project" title="Open project details"></paper-icon-button>
         </div>
       </div>
     </template>
     <div class="actions">
-      <paper-button on-tap="_deleteRequest" data-action="delete-request">
+      <paper-button on-tap="_deleteRequest" data-action="delete-request" title="Removes request from the data store">
         <iron-icon icon="arc:delete"></iron-icon>
         Delete
       </paper-button>
-      <paper-button raised on-tap="_editRequest" data-action="edit-request">
+      <paper-button raised on-tap="_editRequest" data-action="edit-request" title="Opens request editor">
         <iron-icon icon="arc:edit"></iron-icon>
         Edit
       </paper-button>
     </div>
-    <project-model events-target="[[_eventsTarget]]"></project-model>
-    <request-model events-target="[[_eventsTarget]]"></request-model>
   </template>
   <script>
-  Polymer({
-    is: 'saved-request-detail',
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
+  /**
+   * Details applet for saved request object.
+   *
+   * If the request is a history item the set `isHistory` property to `true`.
+   *
+   * The applet doesn't support data edit. Element / app hosting this element
+   * must handle events sent by this element and support edit action.
+   *
+   * ### Example
+   *
+   * ```html
+   * <saved-request-detail request="{...}"></saved-request-detail>
+   * ```
+   *
+   * ### Styling
+   *
+   * `<saved-request-detail>` provides the following custom properties and
+   * mixins for styling:
+   *
+   * Custom property | Description | Default
+   * ----------------|-------------|----------
+   * `--saved-request-detail` | Mixin applied to the element | `{}`
+   * `--saved-request-detail-description` | Mixin applied to request description | `{}`
+   * `--saved-request-detail-description-max-width` | Max width of the description element | `700px`
+   * `--saved-request-detail-description-color` | Color of the request description |
+   * `rgba(0, 0, 0, 0.64)`
+   * `--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
+   * `--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
+   * `--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
+   * `--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`
+   * `--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`
+   * `--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
+   * `--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
+   * `--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
+   * `--saved-request-detail-action-icon-color` | Color of the icon in the action
+   * button | `rgba(0, 0, 0, 0.54)`
+   *
+   * @polymer
+   * @customElement
+   * @memberof UiElements
+   * @demo demo/index.html
+   * @appliesMixin Polymer.IronResizableBehavior
+   */
+  class SavedRequestDetail extends
+    Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
+    static get is() { return 'saved-request-detail'; }
+    static get properties() {
+      return {
+        // Request object to render.
+        request: {
+          type: Object,
+          observer: '_requestChanged'
+        },
+        // True if current item represent a history item.
+        isHistory: {
+          type: Boolean,
+          value: false
+        },
+        // Request's project data, if any
+        _project: Object
+      };
+    }
+    /**
+     * Sets project data when `request` object change.
+     */
+    _requestChanged(request) {
+      if (!request) {
+        this._project = undefined;
+        return;
+      }
+      if (request.legacyProject) {
+        this._readProject(request.legacyProject);
+      } else if (this._project) {
+        this._project = undefined;
+      }
+    }
+    // Reads related project data.
+    _readProject(id) {
+      if (this._project && id === this._project._id) {
+        return;
+      }
+      const e = new CustomEvent('project-read', {
+        cancelable: true,
+        composed: true,
+        bubbles: true,
+        detail: {
+          id
+        }
+      });
+      this.dispatchEvent(e);
+      if (!e.defaultPrevented) {
+        console.warn('Project model not in the DOM.');
+        return;
+      }
+      e.detail.result
+      .then((data) => {
+        this._project = data;
+        Polymer.RenderStatus.afterNextRender(this, () => this.notifyResize());
+      });
+    }
+    /**
+     * Sends `navigate` event set to current read project.
+     */
+    _openProject() {
+      this.dispatchEvent(new CustomEvent('navigate', {
+        cancelable: true,
+        composed: true,
+        bubbles: true,
+        detail: {
+          base: 'project',
+          id: this._project._id
+        }
+      }));
+    }
+    /**
+     * Sends non-bubbling `delete-request` event to the parent element to perform
+     * delete action.
+     */
+    _deleteRequest() {
+      this.dispatchEvent(new CustomEvent('delete-request', {
+        composed: true,
+        detail: {
+          item: this.request
+        }
+      }));
+    }
+
+    /**
+     * Sends non-bubbling `edit-request` event to the parent element to perform
+     * edit action.
+     */
+    _editRequest() {
+      this.dispatchEvent(new CustomEvent('edit-request', {
+        composed: true,
+        detail: {
+          item: this.request
+        }
+      }));
+    }
+
     /**
      * Fired when the user click on the "edit" action button.
      *
@@ -233,97 +327,7 @@ Custom property | Description | Default
      * @param {String} base Always `project`
      * @param {String} id Project ID
      */
-    properties: {
-      //
-      request: Object,
-      // True if current item represent a history item.
-      isHistory: {
-        type: Boolean,
-        value: false
-      },
-      // Request's project data, if any
-      _project: Object,
-      // Events taget for data model.
-      _eventsTarget: {
-        type: Object,
-        value: function() {
-          return this;
-        }
-      }
-    },
-
-    observers: [
-      '_requestChanged(request)'
-    ],
-    /**
-     * Sets project data when `request` object change.
-     */
-    _requestChanged: function(request) {
-      if (!request) {
-        this._project = undefined;
-        return;
-      }
-      if (request.legacyProject) {
-        this._readProject(request.legacyProject);
-      } else if (this._project) {
-        this._project = undefined;
-      }
-    },
-    // Reads related project data.
-    _readProject: function(id) {
-      if (this._project && id === this._project._id) {
-        return;
-      }
-      var event = this.fire('project-read', {
-        id: id
-      }, {
-        cancelable: true,
-        composed: true
-      });
-      if (!event.defaultPrevented) {
-        throw new Error('Model not found');
-      }
-      event.detail.result.then(data => {
-        this._project = data;
-        Polymer.RenderStatus.afterNextRender(this, function() {
-          this.notifyResize();
-        });
-      });
-    },
-    // Sends `navigate` event set to current read project.
-    _openProject: function() {
-      this.fire('navigate', {
-        base: 'project',
-        id: this._project._id
-      }, {
-        cancelable: true,
-        composed: true
-      });
-    },
-
-    /**
-     * Sends non-bubbling `delete-request` event to the parent element to perform
-     * delete action.
-     */
-    _deleteRequest: function() {
-      this.fire('delete-request', {
-        item: this.request
-      }, {
-        bubbles: false
-      });
-    },
-
-    /**
-     * Sends non-bubbling `edit-request` event to the parent element to perform
-     * edit action.
-     */
-    _editRequest: function() {
-      this.fire('edit-request', {
-        item: this.request
-      }, {
-        bubbles: false
-      });
-    }
-  });
+  }
+  window.customElements.define(SavedRequestDetail.is, SavedRequestDetail);
   </script>
 </dom-module>

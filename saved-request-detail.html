@@ -16,7 +16,6 @@ the License.
 <link rel="import" href="../polymer/lib/utils/render-status.html">
 <link rel="import" href="../http-method-label/http-method-label.html">
 <link rel="import" href="../date-time/date-time.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../arc-icons/arc-icons.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
@@ -104,6 +103,10 @@ the License.
     marked-element {
       margin-top: 20px;
     }
+
+    .project-link {
+      @apply --arc-link;
+    }
     </style>
     <template is="dom-if" if="[[isHistory]]">
       <h2>Request details</h2>
@@ -145,17 +148,16 @@ the License.
           Project
         </div>
         <div class="value">
-          [[_project.name]]
-          <paper-icon-button icon="arc:chevron-right" on-tap="_openProject" data-action="open-project" title="Open project details"></paper-icon-button>
+          <a href="#" class="project-link" on-click="_openProject" data-action="open-project" title="Open project details">[[_project.name]]</a>
         </div>
       </div>
     </template>
     <div class="actions">
-      <paper-button on-tap="_deleteRequest" data-action="delete-request" title="Removes request from the data store">
+      <paper-button on-click="_deleteRequest" data-action="delete-request" title="Removes request from the data store">
         <iron-icon icon="arc:delete"></iron-icon>
         Delete
       </paper-button>
-      <paper-button raised on-tap="_editRequest" data-action="edit-request" title="Opens request editor">
+      <paper-button on-click="_editRequest" data-action="edit-request" title="Opens request editor">
         <iron-icon icon="arc:edit"></iron-icon>
         Edit
       </paper-button>
@@ -265,7 +267,8 @@ the License.
     /**
      * Sends `navigate` event set to current read project.
      */
-    _openProject() {
+    _openProject(e) {
+      e.preventDefault();
       this.dispatchEvent(new CustomEvent('navigate', {
         cancelable: true,
         composed: true,

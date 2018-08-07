@@ -23,7 +23,7 @@ the License.
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../marked-element/marked-element.html">
 <link rel="import" href="../markdown-styles/markdown-styles.html">
-
+<link rel="import" href="../paper-chip/paper-chip.html">
 <dom-module id="saved-request-detail">
   <template>
     <style include="markdown-styles"></style>
@@ -107,6 +107,16 @@ the License.
     .project-link {
       @apply --arc-link;
     }
+
+    paper-chip {
+      cursor: pointer;
+    }
+
+    paper-chip[disabled] {
+      --paper-chip-container: {
+        border: 1px var(--error-color) solid;
+      };
+    }
     </style>
     <template is="dom-if" if="[[isHistory]]">
       <h2>Request details</h2>
@@ -142,13 +152,15 @@ the License.
         </div>
       </div>
     </template>
-    <template is="dom-if" if="[[_project]]">
+    <template is="dom-if" if="[[_projects]]">
       <div class="meta-row">
         <div class="label">
-          Project
+          Projects
         </div>
         <div class="value">
-          <a href="#" class="project-link" on-click="_openProject" data-action="open-project" title="Open project details">[[_project.name]]</a>
+          <template is="dom-repeat" items="[[_projects]]">
+            <paper-chip disabled$="[[item.missing]]" title="Open project details" on-click="_openProject" data-action="open-project">[[item.name]]</paper-chip>
+          </template>
         </div>
       </div>
     </template>
@@ -209,7 +221,7 @@ the License.
    */
   class SavedRequestDetail extends
     Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
-    static get is() { return 'saved-request-detail'; }
+    static get is() {return 'saved-request-detail';}
     static get properties() {
       return {
         // Request object to render.
@@ -222,35 +234,43 @@ the License.
           type: Boolean,
           value: false
         },
-        // Request's project data, if any
-        _project: Object
+        /**
+         * Projects data associated with the request.
+         * @type {Array<Object>}
+         */
+        _projects: Array
       };
     }
     /**
      * Sets project data when `request` object change.
+     *
+     * @param {Object} request
      */
     _requestChanged(request) {
       if (!request) {
         this._project = undefined;
         return;
       }
-      if (request.legacyProject) {
-        this._readProject(request.legacyProject);
+      if (request.projects) {
+        this._readProjects(request.projects);
+      } else if (request.legacyProject) {
+        this._readProjects([request.legacyProject]);
       } else if (this._project) {
-        this._project = undefined;
+        this._projects = undefined;
       }
     }
     // Reads related project data.
-    _readProject(id) {
-      if (this._project && id === this._project._id) {
+    _readProjects(ids) {
+      if (!ids || !ids.length) {
+        this._projects = undefined;
         return;
       }
-      const e = new CustomEvent('project-read', {
+      const e = new CustomEvent('project-model-query', {
         cancelable: true,
         composed: true,
         bubbles: true,
         detail: {
-          id
+          keys: ids
         }
       });
       this.dispatchEvent(e);
@@ -260,22 +280,36 @@ the License.
       }
       e.detail.result
       .then((data) => {
-        this._project = data;
+        this._projects = data.map((item, i) => {
+          if (!item) {
+            item = {
+              missing: true,
+              name: ids[i]
+            };
+          } else {
+            item.missing = false;
+          }
+          return item;
+        });
         Polymer.RenderStatus.afterNextRender(this, () => this.notifyResize());
       });
     }
     /**
      * Sends `navigate` event set to current read project.
+     *
+     * @param {ClickEvent} e
      */
     _openProject(e) {
       e.preventDefault();
+      e.stopPropagation();
+      const id = e.model.get('item._id');
       this.dispatchEvent(new CustomEvent('navigate', {
         cancelable: true,
         composed: true,
         bubbles: true,
         detail: {
           base: 'project',
-          id: this._project._id
+          id: id
         }
       }));
     }

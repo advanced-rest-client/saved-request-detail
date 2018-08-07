@@ -13,7 +13,7 @@
   <body>
     <project-model></project-model>
     <request-model></request-model>
-    
+
     <test-fixture id="basic">
       <template>
         <saved-request-detail></saved-request-detail>
@@ -27,7 +27,7 @@
       suiteSetup(function() {
         return DataGenerator.insertSavedIfNotExists()
         .then((data) => {
-          request = data.requests.find((item) => item.legacyProject && item.description);
+          request = data.requests.find((item) => item.projects && item.description);
           if (!request) {
             request = data.requests[0];
           }
@@ -46,19 +46,19 @@
       });
 
       test('Reads project data', function(done) {
-        if (!request.legacyProject) {
+        if (!request.projects) {
           done();
           return;
         }
         this.timeout(2000);
         setTimeout(function() {
-          assert.ok(element._project);
+          assert.typeOf(element._projects, 'array');
           done();
         }, 1000);
       });
 
       test('Fires navigate event for project', function(done) {
-        if (!request.legacyProject) {
+        if (!request.projects) {
           done();
           return;
         }

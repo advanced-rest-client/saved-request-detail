@@ -165,10 +165,12 @@ the License.
       </div>
     </template>
     <div class="actions">
-      <paper-button on-click="_deleteRequest" data-action="delete-request" title="Removes request from the data store">
-        <iron-icon icon="arc:delete"></iron-icon>
-        Delete
-      </paper-button>
+      <template is="dom-if" if="[[isSaved]]">
+        <paper-button on-click="_deleteRequest" data-action="delete-request" title="Removes request from the data store">
+          <iron-icon icon="arc:delete"></iron-icon>
+          Delete
+        </paper-button>
+      </template>
       <paper-button on-click="_editRequest" data-action="edit-request" title="Opens request editor">
         <iron-icon icon="arc:edit"></iron-icon>
         Edit
@@ -238,7 +240,18 @@ the License.
          * Projects data associated with the request.
          * @type {Array<Object>}
          */
-        _projects: Array
+        _projects: Array,
+        /**
+         * Computed value, true if the request has been saved in the data store
+         * whether it's saved or history.
+         * Because request object can have `_id` generated before saving it to
+         * the store this relays on checking both `_id` and `_rev`
+         */
+        isSaved: {
+          type: Boolean,
+          value: false,
+          computed: '_computeIsSaved(request)'
+        }
       };
     }
     /**
@@ -338,7 +351,17 @@ the License.
         }
       }));
     }
-
+    /**
+     * Computes value for `isSaved` property.
+     * @param {Object} request Passed request object
+     * @return {Boolean} True if request has both `_id` and `_rev`.
+     */
+    _computeIsSaved(request) {
+      if (!request) {
+        return false;
+      }
+      return !!(request._id && request._rev);
+    }
     /**
      * Fired when the user click on the "edit" action button.
      *

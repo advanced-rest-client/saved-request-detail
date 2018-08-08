@@ -248,14 +248,14 @@ the License.
      */
     _requestChanged(request) {
       if (!request) {
-        this._project = undefined;
+        this._projects = undefined;
         return;
       }
       if (request.projects) {
         this._readProjects(request.projects);
       } else if (request.legacyProject) {
         this._readProjects([request.legacyProject]);
-      } else if (this._project) {
+      } else if (this._projects) {
         this._projects = undefined;
       }
     }

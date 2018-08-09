@@ -134,14 +134,28 @@ the License.
       </marked-element>
     </template>
 
-    <div class="meta-row">
-      <div class="label">
-        Created
+    <template is="dom-if" if="[[request.created]]">
+      <div class="meta-row">
+        <div class="label">
+          Created
+        </div>
+        <div class="value">
+          <date-time date="[[request.created]]" year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric"></date-time>
+        </div>
       </div>
-      <div class="value">
-        <date-time date="[[request.created]]" year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric"></date-time>
+    </template>
+
+    <template is="dom-if" if="[[_computeHasUpdated(request.updated, request.created)]]">
+      <div class="meta-row">
+        <div class="label">
+          Updated
+        </div>
+        <div class="value">
+          <date-time date="[[request.updated]]" year="numeric" month="numeric" day="numeric" hour="numeric" minute="numeric"></date-time>
+        </div>
       </div>
-    </div>
+    </template>
+
     <template is="dom-if" if="[[request.driveId]]">
       <div class="meta-row">
         <div class="label">
@@ -350,6 +364,13 @@ the License.
           item: this.request
         }
       }));
+    }
+
+    _computeHasUpdated(updated, created) {
+      if (!updated) {
+        return false;
+      }
+      return updated !== created;
     }
     /**
      * Computes value for `isSaved` property.

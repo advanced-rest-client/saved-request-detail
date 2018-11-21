@@ -46,10 +46,12 @@ declare namespace UiElements {
    * Custom property | Description | Default
    * ----------------|-------------|----------
    * `--saved-request-detail` | Mixin applied to the element | `{}`
+   * `--saved-request-detail-color` | Color of the element | `inherit`
+   * `--saved-request-detail-background-color` | Background color of the element | `inherit`
+   * `--saved-request-detail-padding` | Padding of the element. | ``
    * `--saved-request-detail-description` | Mixin applied to request description | `{}`
    * `--saved-request-detail-description-max-width` | Max width of the description element | `700px`
-   * `--saved-request-detail-description-color` | Color of the request description |
-   * `rgba(0, 0, 0, 0.64)`
+   * `--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`
    * `--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
    * `--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
    * `--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
@@ -58,8 +60,10 @@ declare namespace UiElements {
    * `--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
    * `--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
    * `--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
-   * `--saved-request-detail-action-icon-color` | Color of the icon in the action
-   * button | `rgba(0, 0, 0, 0.54)`
+   * `--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`
+   * `--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,
+   * `--saved-request-detail-action-button-color` | Color of action button | `--primary-color`
+   * `--saved-request-detail-action-button-background-color` | Background color of action button | ``
    */
   class SavedRequestDetail extends
     Polymer.IronResizableBehavior(

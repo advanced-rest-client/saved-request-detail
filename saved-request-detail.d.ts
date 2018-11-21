@@ -85,14 +85,41 @@ declare namespace UiElements {
     _projects: Array<object|null>|null;
 
     /**
+     * Computed value, true if the request has been saved in the data store
+     * whether it's saved or history.
+     * Because request object can have `_id` generated before saving it to
+     * the store this relays on checking both `_id` and `_rev`
+     */
+    readonly isSaved: boolean|null|undefined;
+
+    /**
      * Sets project data when `request` object change.
      */
     _requestChanged(request: object|null): void;
 
     /**
      * Reads related project data.
+     *
+     * @param keys List of project IDs to read.
      */
-    _readProjects(ids: any): void;
+    _readProjects(keys: Array<String|null>|null): Promise<any>|null;
+
+    /**
+     * Processes query response from the model.
+     *
+     * @param data The response
+     * @param keys Requested keys
+     * @returns Processed response or undefined.
+     */
+    _processProjectsResponse(data: Array<object|null>|null, keys: Array<String|null>|null): Array<object|null>|null|undefined;
+
+    /**
+     * Dispatches `project-model-query` custom event and returns it.
+     *
+     * @param keys List of project IDs to read.
+     * @returns Dispatched event.
+     */
+    _dispatchModelQuery(keys: Array<String|null>|null): CustomEvent|null;
 
     /**
      * Sends `navigate` event set to current read project.
@@ -110,6 +137,15 @@ declare namespace UiElements {
      * edit action.
      */
     _editRequest(): void;
+    _computeHasUpdated(updated: any, created: any): any;
+
+    /**
+     * Computes value for `isSaved` property.
+     *
+     * @param request Passed request object
+     * @returns True if request has both `_id` and `_rev`.
+     */
+    _computeIsSaved(request: object|null): Boolean|null;
   }
 }
 

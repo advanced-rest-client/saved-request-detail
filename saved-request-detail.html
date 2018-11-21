@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright 2016 The Advanced REST client authors <arc@mulesoft.com>
+Copyright 2018 The Advanced REST client authors <arc@mulesoft.com>
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
 the License at
@@ -295,40 +295,65 @@ the License.
         this._projects = undefined;
       }
     }
-    // Reads related project data.
-    _readProjects(ids) {
-      if (!ids || !ids.length) {
+    /**
+     * Reads related project data.
+     * @param {Array<String>} keys List of project IDs to read.
+     * @return {Promise}
+     */
+    _readProjects(keys) {
+      if (!keys || !keys.length) {
         this._projects = undefined;
+        return Promise.resolve();
+      }
+      const e = this._dispatchModelQuery(keys);
+      if (!e.defaultPrevented) {
+        console.warn('Project model not in the DOM.');
+        return Promise.reject(new Error('Model not found'));
+      }
+      return e.detail.result
+      .then((data) => {
+        this._projects = this._processProjectsResponse(data, keys);
+        Polymer.RenderStatus.afterNextRender(this, () => this.notifyResize());
+      });
+    }
+    /**
+     * Processes query response from the model.
+     * @param {?Array<Object>} data The response
+     * @param {Array<String>} keys Requested keys
+     * @return {Array<Object>|undefined} Processed response or undefined.
+     */
+    _processProjectsResponse(data, keys) {
+      if (!data || !data.length) {
         return;
       }
+      return data.map((item, i) => {
+        if (!item) {
+          item = {
+            missing: true,
+            name: keys[i]
+          };
+        } else {
+          item.missing = false;
+        }
+        return item;
+      });
+    }
+    /**
+     * Dispatches `project-model-query` custom event and returns it.
+     * @param {Array<String>} keys List of project IDs to read.
+     * @return {CustomEvent} Dispatched event.
+     */
+    _dispatchModelQuery(keys) {
       const e = new CustomEvent('project-model-query', {
         cancelable: true,
         composed: true,
         bubbles: true,
         detail: {
-          keys: ids
+          keys
         }
       });
       this.dispatchEvent(e);
-      if (!e.defaultPrevented) {
-        console.warn('Project model not in the DOM.');
-        return;
-      }
-      e.detail.result
-      .then((data) => {
-        this._projects = data.map((item, i) => {
-          if (!item) {
-            item = {
-              missing: true,
-              name: ids[i]
-            };
-          } else {
-            item.missing = false;
-          }
-          return item;
-        });
-        Polymer.RenderStatus.afterNextRender(this, () => this.notifyResize());
-      });
+      return e;
     }
     /**
      * Sends `navigate` event set to current read project.

@@ -189,6 +189,144 @@
         });
       });
     });
+
+    suite('_dispatch()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+      const eName = 'test-event';
+      const eDetail = 'test-detail';
+      test('Dispatches an event', () => {
+        const spy = sinon.spy();
+        element.addEventListener(eName, spy);
+        element._dispatch(eName);
+        assert.isTrue(spy.called);
+      });
+
+      test('Returns the event', () => {
+        const e = element._dispatch(eName);
+        assert.typeOf(e, 'customevent');
+      });
+
+      test('Event is cancelable', () => {
+        const e = element._dispatch(eName);
+        assert.isTrue(e.cancelable);
+      });
+
+      test('Event is composed', () => {
+        const e = element._dispatch(eName);
+        if (typeof e.composed !== 'undefined') {
+          assert.isTrue(e.composed);
+        }
+      });
+
+      test('Event bubbles', () => {
+        const e = element._dispatch(eName);
+        assert.isTrue(e.bubbles);
+      });
+
+      test('Event has detail', () => {
+        const e = element._dispatch(eName, eDetail);
+        assert.equal(e.detail, eDetail);
+      });
+    });
+
+    suite('_disaptchQueryModel()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Calls _dispatch() with argument', () => {
+        const ids = ['a', 'b', 'c'];
+        const spy = sinon.spy(element, '_dispatch');
+        element._disaptchQueryModel(ids);
+        assert.isTrue(spy.called);
+        assert.equal(spy.args[0][0], 'project-model-query');
+        assert.deepEqual(spy.args[0][1].keys, ids);
+      });
+
+      test('Return the event', () => {
+        const ids = ['a', 'b', 'c'];
+        const result = element._disaptchQueryModel(ids);
+        assert.typeOf(result, 'customevent');
+      });
+    });
+
+    suite('_requestChanged()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Clears _projects', () => {
+        element._projects = [];
+        element._requestChanged();
+        assert.isUndefined(element._projects);
+      });
+
+      test('Does nothing when no project data', () => {
+        element._projects = [];
+        element._requestChanged({});
+        assert.isUndefined(element._projects);
+      });
+
+      test('Does nothing when no project data', () => {
+        element._projects = [];
+        element._requestChanged({});
+        assert.isUndefined(element._projects);
+      });
+    });
+
+    suite('_computeHasUpdated()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Returns false when first argument is falsy', () => {
+        const result = element._computeHasUpdated(undefined, 123);
+        assert.isFalse(result);
+      });
+
+      test('Returns false when arguments equal', () => {
+        const result = element._computeHasUpdated(123, 123);
+        assert.isFalse(result);
+      });
+
+      test('Returns true when arguments not equal', () => {
+        const result = element._computeHasUpdated(321, 123);
+        assert.isTrue(result);
+      });
+    });
+
+    suite('_computeIsSaved()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Returns false when no argument', () => {
+        const result = element._computeIsSaved();
+        assert.isFalse(result);
+      });
+
+      test('Returns false when no _id', () => {
+        const result = element._computeIsSaved({_rev: 'test'});
+        assert.isFalse(result);
+      });
+
+      test('Returns false when no _rev', () => {
+        const result = element._computeIsSaved({_id: 'test'});
+        assert.isFalse(result);
+      });
+
+      test('Returns true when _id and _rev', () => {
+        const result = element._computeIsSaved({_id: 'test', _rev: 'test'});
+        assert.isTrue(result);
+      });
+    });
     </script>
 
   </body>

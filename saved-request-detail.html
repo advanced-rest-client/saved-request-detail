@@ -269,21 +269,46 @@ the License.
       };
     }
     /**
+     * Dispatches bubbling and composed custom event.
+     * By default the event is cancelable until `cancelable` property is set to false.
+     * @param {String} type Event type
+     * @param {?any} detail A detail to set
+     * @return {CustomEvent}
+     */
+    _dispatch(type, detail) {
+      const e = new CustomEvent(type, {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+        detail
+      });
+      this.dispatchEvent(e);
+      return e;
+    }
+    /**
+     * Disaptches `project-model-query` custom event.
+     * @param {Array<String>} keys List of project IDs to retreive.
+     * @return {CustomEvent}
+     */
+    _disaptchQueryModel(keys) {
+      return this._dispatch('project-model-query', {
+        keys
+      });
+    }
+    /**
      * Sets project data when `request` object change.
      *
      * @param {Object} request
      */
     _requestChanged(request) {
+      this._projects = undefined;
       if (!request) {
-        this._projects = undefined;
         return;
       }
       if (request.projects) {
         this._readProjects(request.projects);
       } else if (request.legacyProject) {
         this._readProjects([request.legacyProject]);
-      } else if (this._projects) {
-        this._projects = undefined;
       }
     }
     // Reads related project data.
@@ -292,15 +317,7 @@ the License.
         this._projects = undefined;
         return;
       }
-      const e = new CustomEvent('project-model-query', {
-        cancelable: true,
-        composed: true,
-        bubbles: true,
-        detail: {
-          keys: ids
-        }
-      });
-      this.dispatchEvent(e);
+      const e = this._disaptchQueryModel(ids);
       if (!e.defaultPrevented) {
         console.warn('Project model not in the DOM.');
         return;
@@ -325,20 +342,16 @@ the License.
      * Sends `navigate` event set to current read project.
      *
      * @param {ClickEvent} e
+     * @return {CustomEvent} Sent `navigate` event
      */
     _openProject(e) {
       e.preventDefault();
       e.stopPropagation();
       const id = e.model.get('item._id');
-      this.dispatchEvent(new CustomEvent('navigate', {
-        cancelable: true,
-        composed: true,
-        bubbles: true,
-        detail: {
-          base: 'project',
-          id: id
-        }
-      }));
+      return this._dispatch('navigate', {
+        base: 'project',
+        id
+      });
     }
     /**
      * Sends non-bubbling `delete-request` event to the parent element to perform

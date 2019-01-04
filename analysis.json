@@ -97,16 +97,73 @@
       ],
       "methods": [
         {
+          "name": "_dispatch",
+          "description": "Dispatches bubbling and composed custom event.\nBy default the event is cancelable until `cancelable` property is set to false.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 286,
+              "column": 4
+            },
+            "end": {
+              "line": 295,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "type",
+              "type": "String",
+              "description": "Event type"
+            },
+            {
+              "name": "detail",
+              "type": "?any",
+              "description": "A detail to set"
+            }
+          ],
+          "return": {
+            "type": "CustomEvent"
+          }
+        },
+        {
+          "name": "_disaptchQueryModel",
+          "description": "Disaptches `project-model-query` custom event.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 301,
+              "column": 4
+            },
+            "end": {
+              "line": 305,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "keys",
+              "type": "Array.<String>",
+              "description": "List of project IDs to retreive."
+            }
+          ],
+          "return": {
+            "type": "CustomEvent"
+          }
+        },
+        {
           "name": "_requestChanged",
           "description": "Sets project data when `request` object change.",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 284,
+              "line": 311,
               "column": 4
             },
             "end": {
-              "line": 296,
+              "line": 321,
               "column": 5
             }
           },
@@ -127,11 +184,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 302,
+              "line": 327,
               "column": 4
             },
             "end": {
-              "line": 317,
+              "line": 342,
               "column": 5
             }
           },
@@ -153,11 +210,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 324,
+              "line": 349,
               "column": 4
             },
             "end": {
-              "line": 339,
+              "line": 364,
               "column": 5
             }
           },
@@ -180,43 +237,16 @@
           }
         },
         {
-          "name": "_dispatchModelQuery",
-          "description": "Dispatches `project-model-query` custom event and returns it.",
-          "privacy": "protected",
-          "sourceRange": {
-            "start": {
-              "line": 345,
-              "column": 4
-            },
-            "end": {
-              "line": 356,
-              "column": 5
-            }
-          },
-          "metadata": {},
-          "params": [
-            {
-              "name": "keys",
-              "type": "Array.<String>",
-              "description": "List of project IDs to read."
-            }
-          ],
-          "return": {
-            "type": "CustomEvent",
-            "desc": "Dispatched event."
-          }
-        },
-        {
           "name": "_openProject",
           "description": "Sends `navigate` event set to current read project.",
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 362,
+              "line": 371,
               "column": 4
             },
             "end": {
-              "line": 375,
+              "line": 379,
               "column": 5
             }
           },
@@ -228,7 +258,8 @@
             }
           ],
           "return": {
-            "type": "void"
+            "type": "CustomEvent",
+            "desc": "Sent `navigate` event"
           }
         },
         {
@@ -237,11 +268,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 380,
+              "line": 384,
               "column": 4
             },
             "end": {
-              "line": 387,
+              "line": 391,
               "column": 5
             }
           },
@@ -257,11 +288,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 393,
+              "line": 397,
               "column": 4
             },
             "end": {
-              "line": 400,
+              "line": 404,
               "column": 5
             }
           },
@@ -277,11 +308,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 402,
+              "line": 406,
               "column": 4
             },
             "end": {
-              "line": 407,
+              "line": 411,
               "column": 5
             }
           },
@@ -301,11 +332,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 413,
+              "line": 417,
               "column": 4
             },
             "end": {
-              "line": 418,
+              "line": 422,
               "column": 5
             }
           },
@@ -337,7 +368,7 @@
           "column": 2
         },
         "end": {
-          "line": 444,
+          "line": 448,
           "column": 3
         }
       },

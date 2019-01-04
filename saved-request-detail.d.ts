@@ -46,10 +46,12 @@ declare namespace UiElements {
    * Custom property | Description | Default
    * ----------------|-------------|----------
    * `--saved-request-detail` | Mixin applied to the element | `{}`
+   * `--saved-request-detail-color` | Color of the element | `inherit`
+   * `--saved-request-detail-background-color` | Background color of the element | `inherit`
+   * `--saved-request-detail-padding` | Padding of the element. | ``
    * `--saved-request-detail-description` | Mixin applied to request description | `{}`
    * `--saved-request-detail-description-max-width` | Max width of the description element | `700px`
-   * `--saved-request-detail-description-color` | Color of the request description |
-   * `rgba(0, 0, 0, 0.64)`
+   * `--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`
    * `--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
    * `--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
    * `--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
@@ -58,8 +60,10 @@ declare namespace UiElements {
    * `--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
    * `--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
    * `--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
-   * `--saved-request-detail-action-icon-color` | Color of the icon in the action
-   * button | `rgba(0, 0, 0, 0.54)`
+   * `--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`
+   * `--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,
+   * `--saved-request-detail-action-button-color` | Color of action button | `--primary-color`
+   * `--saved-request-detail-action-button-background-color` | Background color of action button | ``
    */
   class SavedRequestDetail extends
     Polymer.IronResizableBehavior(
@@ -81,14 +85,41 @@ declare namespace UiElements {
     _projects: Array<object|null>|null;
 
     /**
+     * Computed value, true if the request has been saved in the data store
+     * whether it's saved or history.
+     * Because request object can have `_id` generated before saving it to
+     * the store this relays on checking both `_id` and `_rev`
+     */
+    readonly isSaved: boolean|null|undefined;
+
+    /**
      * Sets project data when `request` object change.
      */
     _requestChanged(request: object|null): void;
 
     /**
      * Reads related project data.
+     *
+     * @param keys List of project IDs to read.
      */
-    _readProjects(ids: any): void;
+    _readProjects(keys: Array<String|null>|null): Promise<any>|null;
+
+    /**
+     * Processes query response from the model.
+     *
+     * @param data The response
+     * @param keys Requested keys
+     * @returns Processed response or undefined.
+     */
+    _processProjectsResponse(data: Array<object|null>|null, keys: Array<String|null>|null): Array<object|null>|null|undefined;
+
+    /**
+     * Dispatches `project-model-query` custom event and returns it.
+     *
+     * @param keys List of project IDs to read.
+     * @returns Dispatched event.
+     */
+    _dispatchModelQuery(keys: Array<String|null>|null): CustomEvent|null;
 
     /**
      * Sends `navigate` event set to current read project.
@@ -106,6 +137,15 @@ declare namespace UiElements {
      * edit action.
      */
     _editRequest(): void;
+    _computeHasUpdated(updated: any, created: any): any;
+
+    /**
+     * Computes value for `isSaved` property.
+     *
+     * @param request Passed request object
+     * @returns True if request has both `_id` and `_rev`.
+     */
+    _computeIsSaved(request: object|null): Boolean|null;
   }
 }
 

@@ -1,0 +1,355 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+    <link rel="import" href="../../arc-models/project-model.html">
+    <link rel="import" href="../../arc-models/request-model.html">
+    <link rel="import" href="../../arc-data-generator/arc-data-generator.html">
+    <link rel="import" href="../saved-request-detail.html">
+  </head>
+  <body>
+    <project-model></project-model>
+    <request-model></request-model>
+
+    <test-fixture id="Basic">
+      <template>
+        <saved-request-detail></saved-request-detail>
+      </template>
+    </test-fixture>
+
+    <script>
+    /* global DataGenerator, PouchDB */
+    suite('saved-request-detail', function() {
+      let project;
+      suiteSetup(function() {
+        const projects = DataGenerator.generateProjects({
+          projectsSize: 1
+        });
+        const db = new PouchDB('legacy-projects');
+        return db.bulkDocs(projects)
+        .then((result) => {
+          if (result[0].error) {
+            return Promise.reject(new Error(result[0].error));
+          }
+          project = projects[0];
+          project._rev = result[0].rev;
+        });
+      });
+
+      suiteTeardown(function() {
+        return DataGenerator.destroySavedRequestData();
+      });
+
+      function setupWithProject(element, request, projects) {
+        if (projects) {
+          request.projects = projects;
+        }
+        return new Promise((resolve, reject) => {
+          element.addEventListener('project-model-query', function f(e) {
+            element.removeEventListener('project-model-query', f);
+            setTimeout(() => {
+              let rejected;
+              e.detail.result
+              .catch((cause) => {
+                rejected = true;
+                reject(cause);
+              })
+              .then(() => {
+                if (rejected) {
+                  return;
+                }
+                flush(() => resolve());
+              });
+            }, 1);
+          });
+          element.request = request;
+        });
+      }
+
+      suite('Basics', () => {
+        test('Reads project data', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          return setupWithProject(element, request, [project._id])
+          .then(() => {
+            assert.typeOf(element._projects, 'array');
+            const p = element._projects[0];
+            assert.typeOf(p.name, 'string', 'Project has name');
+            assert.isFalse(p.missing, 'Project is not missing');
+          });
+        });
+
+        test('Reads legacy project data', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          request.legacyProject = project._id;
+          return setupWithProject(element, request)
+          .then(() => {
+            assert.typeOf(element._projects, 'array');
+          });
+        });
+
+        test('Keeps non exiting project on the list', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          return setupWithProject(element, request, [project._id, 'non-exiting'])
+          .then(() => {
+            assert.typeOf(element._projects, 'array', 'Projects is computed');
+            assert.lengthOf(element._projects, 2, 'Has 2 projects on the list');
+            const p = element._projects[1];
+            assert.equal(p.name, 'non-exiting', 'Non exiting project has name');
+            assert.isTrue(p.missing, 'Non exiting project is missing');
+          });
+        });
+
+        test('Fires navigate event for project', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          return setupWithProject(element, request, [project._id])
+          .then(() => {
+            const node = element.shadowRoot.querySelector('[data-action="open-project"]');
+            const spy = sinon.spy();
+            element.addEventListener('navigate', spy);
+            assert.ok(node, 'Has project open button');
+            node.click();
+            assert.isTrue(spy.called);
+          });
+        });
+
+        test('Renders delete button when saved', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          request._rev = 'test';
+          return setupWithProject(element, request, [project._id])
+          .then(() => {
+            const node = element.shadowRoot.querySelector('[data-action="delete-request"]');
+            assert.ok(node);
+          });
+        });
+
+        test('Fires delete-request event', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          request._rev = 'test';
+          return setupWithProject(element, request, [project._id])
+          .then(() => {
+            let eventData;
+            element.addEventListener('delete-request', function(e) {
+              eventData = e.detail;
+              assert.isFalse(e.bubbles);
+            });
+            const node = element.shadowRoot.querySelector('[data-action="delete-request"]');
+            node.click();
+            assert.typeOf(eventData, 'object');
+            assert.typeOf(eventData.item, 'object');
+          });
+        });
+
+        test('Fires edit-request event', function() {
+          const element = fixture('Basic');
+          const request = DataGenerator.generateSavedItem({});
+          request._rev = 'test';
+          return setupWithProject(element, request, [project._id])
+          .then(() => {
+            let eventData;
+            element.addEventListener('edit-request', function(e) {
+              eventData = e.detail;
+              assert.isFalse(e.bubbles);
+            });
+            const node = element.shadowRoot.querySelector('[data-action="edit-request"]');
+            node.click();
+            assert.typeOf(eventData, 'object');
+            assert.typeOf(eventData.item, 'object');
+          });
+        });
+      });
+
+      suite('_computeIsSaved()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Returns false when no argument', () => {
+          const result = element._computeIsSaved();
+          assert.isFalse(result);
+        });
+
+        test('Returns false when no _id', () => {
+          const result = element._computeIsSaved({
+            _rev: 'test'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns false when no _rev', () => {
+          const result = element._computeIsSaved({
+            _id: 'test'
+          });
+          assert.isFalse(result);
+        });
+
+        test('Returns true when _id and _rev', () => {
+          const result = element._computeIsSaved({
+            _id: 'test',
+            _rev: 'test'
+          });
+          assert.isTrue(result);
+        });
+
+        test('Computes "isSaved"', function() {
+          const request = DataGenerator.generateSavedItem({});
+          request._rev = 'test';
+          element.request = request;
+          assert.isTrue(element.isSaved);
+        });
+
+        test('Computes "isSaved" when no _rev', function() {
+          const request = DataGenerator.generateSavedItem({});
+          element.request = request;
+          assert.isFalse(element.isSaved);
+        });
+
+        test('Computes "isSaved" when no _id', function() {
+          const request = DataGenerator.generateSavedItem({});
+          request._rev = 'test';
+          delete request._id;
+          element.request = request;
+          assert.isFalse(element.isSaved);
+        });
+      });
+
+      suite('_computeHasUpdated()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Returns false when no updated time', () => {
+          const result = element._computeHasUpdated(undefined, 1);
+          assert.isFalse(result);
+        });
+
+        test('Returns false when created time equals updated', () => {
+          const result = element._computeHasUpdated(1, 1);
+          assert.isFalse(result);
+        });
+
+        test('Returns true when created time not equals updated', () => {
+          const result = element._computeHasUpdated(2, 1);
+          assert.isTrue(result);
+        });
+      });
+
+      suite('_processProjectsResponse()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Returns undefined when no argument', () => {
+          const result = element._processProjectsResponse();
+          assert.isUndefined(result);
+        });
+
+        test('Returns undefined when empty array', () => {
+          const result = element._processProjectsResponse([]);
+          assert.isUndefined(result);
+        });
+
+        test('Returns array of items', () => {
+          const result = element._processProjectsResponse([{_id: 'test'}]);
+          assert.typeOf(result, 'array');
+          assert.lengthOf(result, 1);
+        });
+
+        test('Adds "missing" property with false to an existing item', () => {
+          const result = element._processProjectsResponse([{}]);
+          assert.isFalse(result[0].missing);
+        });
+
+        test('Adds "missing" property with true to empty item', () => {
+          const result = element._processProjectsResponse([undefined], ['test']);
+          assert.isTrue(result[0].missing);
+        });
+
+        test('Adds "name" property to empty item', () => {
+          const result = element._processProjectsResponse([undefined], ['test']);
+          assert.equal(result[0].name, 'test');
+        });
+      });
+
+      suite('_readProjects()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('Sets `_projects` to `undefined` when no argument', () => {
+          element._projects = [];
+          element._readProjects();
+          assert.isUndefined(element._projects);
+        });
+
+        test('Do not dispatches query event when no argument', () => {
+          let called = false;
+          element.addEventListener('project-model-query', function f() {
+            element.removeEventListener('project-model-query', f);
+            called = true;
+          });
+          element._readProjects();
+          assert.isFalse(called);
+        });
+
+        test('Returns a promise when no argument', () => {
+          const result = element._readProjects();
+          assert.typeOf(result.then, 'function');
+          return result;
+        });
+
+        test('Rejects promise when no model', (done) => {
+          element.addEventListener('project-model-query', function f(e) {
+            element.removeEventListener('project-model-query', f);
+            e.stopPropagation();
+          });
+          const result = element._readProjects(['test']);
+          result
+          .then(() => done(new Error('Should not result')))
+          .catch(() => done());
+        });
+
+        test('Sets _projects property', () => {
+          return element._readProjects([project._id])
+          .then(() => {
+            assert.typeOf(element._projects, 'array');
+            assert.lengthOf(element._projects, 1);
+          });
+        });
+      });
+
+      suite('_requestChanged()', () => {
+        let element;
+        setup(() => {
+          element = fixture('Basic');
+        });
+
+        test('resets _projects when no argument', () => {
+          element._projects = [];
+          element._requestChanged();
+          assert.isUndefined(element._projects);
+        });
+
+        test('resets _projects when request as no project', () => {
+          element._projects = [];
+          element._requestChanged({});
+          assert.isUndefined(element._projects);
+        });
+      });
+    });
+    </script>
+
+  </body>
+</html>

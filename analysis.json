@@ -2,7 +2,7 @@
   "schema_version": "1.0.0",
   "elements": [
     {
-      "description": "Details applet for saved request object.\n\nIf the request is a history item the set `isHistory` property to `true`.\n\nThe applet doesn't support data edit. Element / app hosting this element\nmust handle events sent by this element and support edit action.\n\n### Example\n\n```html\n<saved-request-detail request=\"{...}\"></saved-request-detail>\n```\n\n### Styling\n\n`<saved-request-detail>` provides the following custom properties and\nmixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-detail` | Mixin applied to the element | `{}`\n`--saved-request-detail-description` | Mixin applied to request description | `{}`\n`--saved-request-detail-description-max-width` | Max width of the description element | `700px`\n`--saved-request-detail-description-color` | Color of the request description |\n`rgba(0, 0, 0, 0.64)`\n`--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`\n`--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`\n`--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`\n`--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`\n`--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`\n`--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`\n`--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`\n`--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`\n`--saved-request-detail-action-icon-color` | Color of the icon in the action\nbutton | `rgba(0, 0, 0, 0.54)`",
+      "description": "Details applet for saved request object.\n\nIf the request is a history item the set `isHistory` property to `true`.\n\nThe applet doesn't support data edit. Element / app hosting this element\nmust handle events sent by this element and support edit action.\n\n### Example\n\n```html\n<saved-request-detail request=\"{...}\"></saved-request-detail>\n```\n\n### Styling\n\n`<saved-request-detail>` provides the following custom properties and\nmixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-detail` | Mixin applied to the element | `{}`\n`--saved-request-detail-color` | Color of the element | `inherit`\n`--saved-request-detail-background-color` | Background color of the element | `inherit`\n`--saved-request-detail-padding` | Padding of the element. | ``\n`--saved-request-detail-description` | Mixin applied to request description | `{}`\n`--saved-request-detail-description-max-width` | Max width of the description element | `700px`\n`--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`\n`--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`\n`--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`\n`--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`\n`--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`\n`--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`\n`--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`\n`--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`\n`--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`\n`--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`\n`--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,\n`--saved-request-detail-action-button-color` | Color of action button | `--primary-color`\n`--saved-request-detail-action-button-background-color` | Background color of action button | ``",
       "summary": "",
       "path": "saved-request-detail.html",
       "properties": [
@@ -13,11 +13,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 227,
+              "line": 252,
               "column": 8
             },
             "end": {
-              "line": 230,
+              "line": 255,
               "column": 9
             }
           },
@@ -35,11 +35,11 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 232,
+              "line": 257,
               "column": 8
             },
             "end": {
-              "line": 235,
+              "line": 260,
               "column": 9
             }
           },
@@ -57,11 +57,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 240,
+              "line": 265,
               "column": 8
             },
             "end": {
-              "line": 240,
+              "line": 265,
               "column": 24
             }
           },
@@ -70,6 +70,29 @@
               "attributeType": "Array"
             }
           }
+        },
+        {
+          "name": "isSaved",
+          "type": "boolean | null | undefined",
+          "description": "Computed value, true if the request has been saved in the data store\nwhether it's saved or history.\nBecause request object can have `_id` generated before saving it to\nthe store this relays on checking both `_id` and `_rev`",
+          "privacy": "public",
+          "sourceRange": {
+            "start": {
+              "line": 272,
+              "column": 8
+            },
+            "end": {
+              "line": 276,
+              "column": 9
+            }
+          },
+          "metadata": {
+            "polymer": {
+              "readOnly": true,
+              "attributeType": "Boolean"
+            }
+          },
+          "defaultValue": "false"
         }
       ],
       "methods": [
@@ -79,11 +102,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 248,
+              "line": 284,
               "column": 4
             },
             "end": {
-              "line": 260,
+              "line": 296,
               "column": 5
             }
           },
@@ -104,22 +127,83 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 262,
+              "line": 302,
               "column": 4
             },
             "end": {
-              "line": 295,
+              "line": 317,
               "column": 5
             }
           },
           "metadata": {},
           "params": [
             {
-              "name": "ids"
+              "name": "keys",
+              "type": "Array.<String>",
+              "description": "List of project IDs to read."
             }
           ],
           "return": {
-            "type": "void"
+            "type": "Promise"
+          }
+        },
+        {
+          "name": "_processProjectsResponse",
+          "description": "Processes query response from the model.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 324,
+              "column": 4
+            },
+            "end": {
+              "line": 339,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "data",
+              "type": "?Array.<Object>",
+              "description": "The response"
+            },
+            {
+              "name": "keys",
+              "type": "Array.<String>",
+              "description": "Requested keys"
+            }
+          ],
+          "return": {
+            "type": "(Array.<Object> | undefined)",
+            "desc": "Processed response or undefined."
+          }
+        },
+        {
+          "name": "_dispatchModelQuery",
+          "description": "Dispatches `project-model-query` custom event and returns it.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 345,
+              "column": 4
+            },
+            "end": {
+              "line": 356,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "keys",
+              "type": "Array.<String>",
+              "description": "List of project IDs to read."
+            }
+          ],
+          "return": {
+            "type": "CustomEvent",
+            "desc": "Dispatched event."
           }
         },
         {
@@ -128,11 +212,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 301,
+              "line": 362,
               "column": 4
             },
             "end": {
-              "line": 314,
+              "line": 375,
               "column": 5
             }
           },
@@ -153,11 +237,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 319,
+              "line": 380,
               "column": 4
             },
             "end": {
-              "line": 326,
+              "line": 387,
               "column": 5
             }
           },
@@ -173,11 +257,11 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 332,
+              "line": 393,
               "column": 4
             },
             "end": {
-              "line": 339,
+              "line": 400,
               "column": 5
             }
           },
@@ -185,6 +269,57 @@
           "params": [],
           "return": {
             "type": "void"
+          }
+        },
+        {
+          "name": "_computeHasUpdated",
+          "description": "",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 402,
+              "column": 4
+            },
+            "end": {
+              "line": 407,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "updated"
+            },
+            {
+              "name": "created"
+            }
+          ]
+        },
+        {
+          "name": "_computeIsSaved",
+          "description": "Computes value for `isSaved` property.",
+          "privacy": "protected",
+          "sourceRange": {
+            "start": {
+              "line": 413,
+              "column": 4
+            },
+            "end": {
+              "line": 418,
+              "column": 5
+            }
+          },
+          "metadata": {},
+          "params": [
+            {
+              "name": "request",
+              "type": "Object",
+              "description": "Passed request object"
+            }
+          ],
+          "return": {
+            "type": "Boolean",
+            "desc": "True if request has both `_id` and `_rev`."
           }
         }
       ],
@@ -198,11 +333,11 @@
       "metadata": {},
       "sourceRange": {
         "start": {
-          "line": 221,
+          "line": 246,
           "column": 2
         },
         "end": {
-          "line": 366,
+          "line": 444,
           "column": 3
         }
       },
@@ -215,11 +350,11 @@
           "description": "Request object to render.",
           "sourceRange": {
             "start": {
-              "line": 227,
+              "line": 252,
               "column": 8
             },
             "end": {
-              "line": 230,
+              "line": 255,
               "column": 9
             }
           },
@@ -231,11 +366,27 @@
           "description": "True if current item represent a history item.",
           "sourceRange": {
             "start": {
-              "line": 232,
+              "line": 257,
               "column": 8
             },
             "end": {
-              "line": 235,
+              "line": 260,
+              "column": 9
+            }
+          },
+          "metadata": {},
+          "type": "boolean | null | undefined"
+        },
+        {
+          "name": "is-saved",
+          "description": "Computed value, true if the request has been saved in the data store\nwhether it's saved or history.\nBecause request object can have `_id` generated before saving it to\nthe store this relays on checking both `_id` and `_rev`",
+          "sourceRange": {
+            "start": {
+              "line": 272,
+              "column": 8
+            },
+            "end": {
+              "line": 276,
               "column": 9
             }
           },

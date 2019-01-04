@@ -16,6 +16,7 @@
   <link rel="import" href="../../paper-styles/paper-styles.html">
   <link rel="import" href="../../paper-button/paper-button.html">
   <link rel="import" href="../saved-request-detail.html">
+  <link rel="import" href="../../arc-electron-default-theme/arc-electron-default-theme.html">
   <custom-style>
     <style include="demo-pages-shared-styles">
     body,
@@ -26,31 +27,13 @@
       padding: 0;
     }
 
-    :root {
-      --primary-color: #00A2DF;
-      --arc-font-headline: {
-        @apply --paper-font-headline;
-      };
-
-      --arc-font-body1: {
-        @apply --paper-font-body1;
-      };
-
-      --arc-font-common-nowrap: {
-        @apply --paper-font-common-nowrap;
-      };
-
-      --arc-link: {
-         @apply --paper-font-common-base;
-         color: #00A1DF;
-       };
-    }
-
     .card {
       @apply --shadow-elevation-4dp;
       padding: 20px;
-      background: white;
-      margin-bottom: 40px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      background-color: #fff;
     }
 
     .app {
@@ -95,6 +78,10 @@
           <div class="centered card">
             <paper-button on-click="generateData">Generate 100 items</paper-button>
             <paper-button on-click="clearData">Clear datastore</paper-button>
+            <paper-button on-click="stylePanel">Apply theme</paper-button>
+            <template is="dom-if" if="[[styled]]">
+              <paper-button on-click="unstylePanel">Remove theme</paper-button>
+            </template>
           </div>
         </section>
       </div>
@@ -108,6 +95,7 @@
   <script>
   /* global DataGenerator */
   (function(app) {
+    app.styled = false;
     app.generateData = function() {
       DataGenerator.insertSavedRequestData({
         requestsSize: 100
@@ -157,6 +145,30 @@
           result.projects.push('non-existing-id');
         }
         app.request = result;
+      });
+    };
+    app.stylePanel = function() {
+      app.styled = true;
+      const panel = document.body.querySelector('saved-request-detail');
+      panel.updateStyles({
+        '--saved-request-detail-background-color': '#37474F',
+        '--saved-request-detail-color': '#fff',
+        '--saved-request-detail-padding': '20px',
+        '--saved-request-detail-data-list-color': 'rgba(255,255,255,.64)',
+        '--saved-request-detail-action-button-color': '#fff',
+        '--saved-request-detail-action-icon-color': 'rgba(255,255,255,.64)'
+      });
+    };
+    app.unstylePanel = function() {
+      app.styled = false;
+      const panel = document.body.querySelector('saved-request-detail');
+      panel.updateStyles({
+        '--saved-request-detail-background-color': '',
+        '--saved-request-detail-color': '',
+        '--saved-request-detail-padding': '',
+        '--saved-request-detail-data-list-color': '',
+        '--saved-request-detail-action-button-color': '',
+        '--saved-request-detail-action-icon-color': ''
       });
     };
     // window.addEventListener('WebComponentsReady', function() {

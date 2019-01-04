@@ -1,88 +1,123 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-
   <title>saved-request-detail demo</title>
-
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+  <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
   <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
-  <link rel="import" href="../../arc-demo-helpers/data-generator.html">
+  <link rel="import" href="../../arc-models/project-model.html">
+  <link rel="import" href="../../arc-models/request-model.html">
+  <link rel="import" href="../../arc-data-generator/arc-data-generator.html">
+  <link rel="import" href="../../saved-menu/saved-menu.html">
   <link rel="import" href="../../paper-toast/paper-toast.html">
-
-  <link rel="import" href="../saved-request-detail.html">
   <link rel="import" href="../../paper-styles/paper-styles.html">
-
-  <style is="custom-style" include="demo-pages-shared-styles">
-  body,
-  html {
-    background-color: #e5e5e5;
-  }
-
-  :root {
-    --primary-color: #00A2DF;
-    --arc-font-headline: {
-      @apply --paper-font-headline;
-    };
-
-    --arc-font-body1: {
-      @apply --paper-font-body1;
+  <link rel="import" href="../../paper-button/paper-button.html">
+  <link rel="import" href="../saved-request-detail.html">
+  <link rel="import" href="../../arc-electron-default-theme/arc-electron-default-theme.html">
+  <custom-style>
+    <style include="demo-pages-shared-styles">
+    body,
+    html {
+      background-color: #e5e5e5;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
     }
 
-    --arc-font-common-nowrap: {
-      @apply --paper-font-common-nowrap;
+    .card {
+      @apply --shadow-elevation-4dp;
+      padding: 20px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      box-sizing: border-box;
+      background-color: #fff;
     }
-  }
 
-  .vertical-section-container {
-    max-width: 600px;
-  }
+    .app {
+      @apply --layout-horizontal;
+      height: 100vh;
+    }
 
-  section[card] {
-    @apply(--shadow-elevation-4dp);
-    padding: 20px;
-    background: white;
-    margin-bottom: 40px;
-  }
+    nav {
+      min-width: 256px;
+      width: 256px;
+      height: 100vh;
+      background-color: #fff;
+    }
 
-  </style>
+    saved-menu {
+      overflow: auto;
+      width: 256px;
+      height: 100vh;
+    }
+
+    .main {
+      @apply --layout-flex;
+      margin-top: 24px;
+    }
+    </style>
+  </custom-style>
 </head>
 <body unresolved>
-  <template is="dom-bind" id="app">
-    <div class="vertical-section-container centered">
-      <section card>
-        <saved-request-detail request="[[request]]" on-edit-request="_onEdit" on-delete-request="_onDelete" on-navigate="_onNavigate"></saved-request-detail>
-      </section>
-    </div>
-    <paper-toast id="navToast" text="Navigate to project event handled"></paper-toast>
-    <paper-toast id="deleteToast" text="Delete request event handled"></paper-toast>
-    <paper-toast id="editToast" text="Edit request event handled"></paper-toast>
-  </template>
+  <dom-bind id="app">
+    <template>
+      <project-model></project-model>
+      <request-model></request-model>
+      <div class="app">
+        <nav>
+          <saved-menu on-navigate="_selectRequest"></saved-menu>
+        </nav>
+        <section class="main">
+          <div class="centered card">
+            <saved-request-detail request="[[request]]" on-edit-request="_onEdit" on-delete-request="_onDelete" on-navigate="_onNavigate"></saved-request-detail>
+          </div>
 
+          <div class="centered card">
+            <paper-button on-click="generateData">Generate 100 items</paper-button>
+            <paper-button on-click="clearData">Clear datastore</paper-button>
+            <paper-button on-click="stylePanel">Apply theme</paper-button>
+            <template is="dom-if" if="[[styled]]">
+              <paper-button on-click="unstylePanel">Remove theme</paper-button>
+            </template>
+          </div>
+        </section>
+      </div>
+      <paper-toast id="genToast" text="The request data has been generated"></paper-toast>
+      <paper-toast id="clearToast" text="The request data has been removed"></paper-toast>
+      <paper-toast id="navToast" text="Navigate to project event handled"></paper-toast>
+      <paper-toast id="deleteToast" text="Delete request event handled"></paper-toast>
+      <paper-toast id="editToast" text="Edit request event handled"></paper-toast>
+    </template>
+  </dom-bind>
   <script>
   /* global DataGenerator */
   (function(app) {
-    app.init = function() {
-      DataGenerator.insertSavedIfNotExists()
-      .then(data => {
-        var request = data.requests.find(item => item.legacyProject && item.description);
-        if (!request) {
-          request = data.requests[0];
-        }
-        app.request = request;
+    app.styled = false;
+    app.generateData = function() {
+      DataGenerator.insertSavedRequestData({
+        requestsSize: 100
+      })
+      .then(() => {
+        document.getElementById('genToast').opened = true;
+        document.body.dispatchEvent(new CustomEvent('data-imported', {
+          bubbles: true
+        }));
+      });
+    };
+    app.clearData = function() {
+      DataGenerator.destroySavedRequestData()
+      .then(() => {
+        document.getElementById('clearToast').opened = true;
+        const e = new CustomEvent('datastore-destroyed', {
+          detail: {
+            datastore: 'all'
+          },
+          bubbles: true
+        });
+        document.body.dispatchEvent(e);
       });
     };
     app._onEdit = function() {
@@ -94,9 +129,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     app._onNavigate = function() {
       document.getElementById('navToast').opened = true;
     };
-    window.addEventListener('WebComponentsReady', function() {
-      app.init();
-    });
+    app._selectRequest = function(e) {
+      const ev = new CustomEvent('request-object-read', {
+        bubbles: true,
+        cancelable: true,
+        detail: {
+          id: e.detail.id,
+          type: 'saved'
+        }
+      });
+      document.body.dispatchEvent(ev);
+      ev.detail.result
+      .then((result) => {
+        if (result.projects) {
+          result.projects.push('non-existing-id');
+        }
+        app.request = result;
+      });
+    };
+    app.stylePanel = function() {
+      app.styled = true;
+      const panel = document.body.querySelector('saved-request-detail');
+      panel.updateStyles({
+        '--saved-request-detail-background-color': '#37474F',
+        '--saved-request-detail-color': '#fff',
+        '--saved-request-detail-padding': '20px',
+        '--saved-request-detail-data-list-color': 'rgba(255,255,255,.64)',
+        '--saved-request-detail-action-button-color': '#fff',
+        '--saved-request-detail-action-icon-color': 'rgba(255,255,255,.64)'
+      });
+    };
+    app.unstylePanel = function() {
+      app.styled = false;
+      const panel = document.body.querySelector('saved-request-detail');
+      panel.updateStyles({
+        '--saved-request-detail-background-color': '',
+        '--saved-request-detail-color': '',
+        '--saved-request-detail-padding': '',
+        '--saved-request-detail-data-list-color': '',
+        '--saved-request-detail-action-button-color': '',
+        '--saved-request-detail-action-icon-color': ''
+      });
+    };
+    // window.addEventListener('WebComponentsReady', function() {
+    //   app.init();
+    // });
   })(document.querySelector('#app'));
   </script>
 </body>

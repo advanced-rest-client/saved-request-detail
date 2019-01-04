@@ -1,44 +1,41 @@
 <!doctype html>
-<!--
-@license
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
 <html>
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/test-helpers.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
-    <link rel="import" href="../../arc-demo-helpers/data-generator.html">
+    <link rel="import" href="../../arc-models/project-model.html">
+    <link rel="import" href="../../arc-models/request-model.html">
+    <link rel="import" href="../../arc-data-generator/arc-data-generator.html">
     <link rel="import" href="../saved-request-detail.html">
   </head>
   <body>
+    <project-model></project-model>
+    <request-model></request-model>
 
-    <test-fixture id="basic">
+    <test-fixture id="Basic">
       <template>
         <saved-request-detail></saved-request-detail>
       </template>
     </test-fixture>
 
     <script>
-    /* global fixture, assert, DataGenerator, TestHelpers, MockInteractions, sinon */
+    /* global DataGenerator, PouchDB */
     suite('basic', function() {
-      var request;
+      let project;
       suiteSetup(function() {
-        return DataGenerator.insertSavedIfNotExists()
-        .then(data => {
-          request = data.requests.find(item => item.legacyProject && item.description);
-          if (!request) {
-            request = data.requests[0];
+        const projects = DataGenerator.generateProjects({
+          projectsSize: 1
+        });
+        const db = new PouchDB('legacy-projects');
+        return db.bulkDocs(projects)
+        .then((result) => {
+          if (result[0].error) {
+            return Promise.reject(new Error(result[0].error));
           }
+          project = projects[0];
+          project._rev = result[0].rev;
         });
       });
 
@@ -46,64 +43,288 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         return DataGenerator.destroySavedRequestData();
       });
 
-      var element;
-      setup(function() {
-        element = fixture('basic');
-        element.request = request;
-        TestHelpers.forceXIfStamp(element);
+      function setupWithProject(element, request, projects) {
+        if (projects) {
+          request.projects = projects;
+        }
+        return new Promise((resolve, reject) => {
+          element.addEventListener('project-model-query', function f(e) {
+            element.removeEventListener('project-model-query', f);
+            setTimeout(() => {
+              let rejected;
+              e.detail.result
+              .catch((cause) => {
+                rejected = true;
+                reject(cause);
+              })
+              .then(() => {
+                if (rejected) {
+                  return;
+                }
+                flush(() => resolve());
+              });
+            }, 1);
+          });
+          element.request = request;
+        });
+      }
+
+      test('Reads project data', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        return setupWithProject(element, request, [project._id])
+        .then(() => {
+          assert.typeOf(element._projects, 'array');
+          const p = element._projects[0];
+          assert.typeOf(p.name, 'string', 'Project has name');
+          assert.isFalse(p.missing, 'Project is not missing');
+        });
       });
 
-      test('Reads project data', function(done) {
-        if (!request.legacyProject) {
-          done();
-          return;
-        }
-        this.timeout(2000);
-        setTimeout(function() {
-          assert.ok(element._project);
-          done();
-        }, 1000);
+      test('Reads legacy project data', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request.legacyProject = project._id;
+        return setupWithProject(element, request)
+        .then(() => {
+          assert.typeOf(element._projects, 'array');
+        });
       });
 
-      test('Fires navigate event for project', function(done) {
-        if (!request.legacyProject) {
-          done();
-          return;
-        }
-        this.timeout(2000);
-        setTimeout(function() {
-          let node = Polymer.dom(element.root).querySelector('[data-action="open-project"]');
-          let spy = sinon.spy();
+      test('Keeps non exiting project on the list', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        return setupWithProject(element, request, [project._id, 'non-exiting'])
+        .then(() => {
+          assert.typeOf(element._projects, 'array', 'Projects is computed');
+          assert.lengthOf(element._projects, 2, 'Has 2 projects on the list');
+          const p = element._projects[1];
+          assert.equal(p.name, 'non-exiting', 'Non exiting project has name');
+          assert.isTrue(p.missing, 'Non exiting project is missing');
+        });
+      });
+
+      test('Fires navigate event for project', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        return setupWithProject(element, request, [project._id])
+        .then(() => {
+          const node = element.shadowRoot.querySelector('[data-action="open-project"]');
+          const spy = sinon.spy();
           element.addEventListener('navigate', spy);
           assert.ok(node, 'Has project open button');
-          MockInteractions.tap(node);
+          node.click();
           assert.isTrue(spy.called);
-          done();
-        }, 1000);
+        });
+      });
+
+      test('Computes "isSaved"', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request._rev = 'test';
+        element.request = request;
+        assert.isTrue(element.isSaved);
+      });
+
+      test('Computes "isSaved" when no _rev', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        element.request = request;
+        assert.isFalse(element.isSaved);
+      });
+
+      test('Computes "isSaved" when no _id', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request._rev = 'test';
+        delete request._id;
+        element.request = request;
+        assert.isFalse(element.isSaved);
+      });
+
+      test('Renders delete button when saved', function() {
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request._rev = 'test';
+        return setupWithProject(element, request, [project._id])
+        .then(() => {
+          const node = element.shadowRoot.querySelector('[data-action="delete-request"]');
+          assert.ok(node);
+        });
       });
 
       test('Fires delete-request event', function() {
-        var eventData;
-        element.addEventListener('delete-request', function(e) {
-          eventData = e.detail;
-          assert.isFalse(e.bubbles);
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request._rev = 'test';
+        return setupWithProject(element, request, [project._id])
+        .then(() => {
+          let eventData;
+          element.addEventListener('delete-request', function(e) {
+            eventData = e.detail;
+            assert.isFalse(e.bubbles);
+          });
+          const node = element.shadowRoot.querySelector('[data-action="delete-request"]');
+          node.click();
+          assert.typeOf(eventData, 'object');
+          assert.typeOf(eventData.item, 'object');
         });
-        var node = Polymer.dom(element.root).querySelector('[data-action="delete-request"]');
-        MockInteractions.tap(node);
-        assert.typeOf(eventData, 'object');
-        assert.typeOf(eventData.item, 'object');
       });
 
       test('Fires edit-request event', function() {
-        var eventData;
-        element.addEventListener('edit-request', function(e) {
-          eventData = e.detail;
-          assert.isFalse(e.bubbles);
+        const element = fixture('Basic');
+        const request = DataGenerator.generateSavedItem({});
+        request._rev = 'test';
+        return setupWithProject(element, request, [project._id])
+        .then(() => {
+          let eventData;
+          element.addEventListener('edit-request', function(e) {
+            eventData = e.detail;
+            assert.isFalse(e.bubbles);
+          });
+          const node = element.shadowRoot.querySelector('[data-action="edit-request"]');
+          node.click();
+          assert.typeOf(eventData, 'object');
+          assert.typeOf(eventData.item, 'object');
         });
-        var node = Polymer.dom(element.root).querySelector('[data-action="edit-request"]');
-        MockInteractions.tap(node);
-        assert.typeOf(eventData, 'object');
-        assert.typeOf(eventData.item, 'object');
+      });
+    });
+
+    suite('_dispatch()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+      const eName = 'test-event';
+      const eDetail = 'test-detail';
+      test('Dispatches an event', () => {
+        const spy = sinon.spy();
+        element.addEventListener(eName, spy);
+        element._dispatch(eName);
+        assert.isTrue(spy.called);
+      });
+
+      test('Returns the event', () => {
+        const e = element._dispatch(eName);
+        assert.typeOf(e, 'customevent');
+      });
+
+      test('Event is cancelable', () => {
+        const e = element._dispatch(eName);
+        assert.isTrue(e.cancelable);
+      });
+
+      test('Event is composed', () => {
+        const e = element._dispatch(eName);
+        if (typeof e.composed !== 'undefined') {
+          assert.isTrue(e.composed);
+        }
+      });
+
+      test('Event bubbles', () => {
+        const e = element._dispatch(eName);
+        assert.isTrue(e.bubbles);
+      });
+
+      test('Event has detail', () => {
+        const e = element._dispatch(eName, eDetail);
+        assert.equal(e.detail, eDetail);
+      });
+    });
+
+    suite('_disaptchQueryModel()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Calls _dispatch() with argument', () => {
+        const ids = ['a', 'b', 'c'];
+        const spy = sinon.spy(element, '_dispatch');
+        element._disaptchQueryModel(ids);
+        assert.isTrue(spy.called);
+        assert.equal(spy.args[0][0], 'project-model-query');
+        assert.deepEqual(spy.args[0][1].keys, ids);
+      });
+
+      test('Return the event', () => {
+        const ids = ['a', 'b', 'c'];
+        const result = element._disaptchQueryModel(ids);
+        assert.typeOf(result, 'customevent');
+      });
+    });
+
+    suite('_requestChanged()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Clears _projects', () => {
+        element._projects = [];
+        element._requestChanged();
+        assert.isUndefined(element._projects);
+      });
+
+      test('Does nothing when no project data', () => {
+        element._projects = [];
+        element._requestChanged({});
+        assert.isUndefined(element._projects);
+      });
+
+      test('Does nothing when no project data', () => {
+        element._projects = [];
+        element._requestChanged({});
+        assert.isUndefined(element._projects);
+      });
+    });
+
+    suite('_computeHasUpdated()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Returns false when first argument is falsy', () => {
+        const result = element._computeHasUpdated(undefined, 123);
+        assert.isFalse(result);
+      });
+
+      test('Returns false when arguments equal', () => {
+        const result = element._computeHasUpdated(123, 123);
+        assert.isFalse(result);
+      });
+
+      test('Returns true when arguments not equal', () => {
+        const result = element._computeHasUpdated(321, 123);
+        assert.isTrue(result);
+      });
+    });
+
+    suite('_computeIsSaved()', () => {
+      let element;
+      setup(() => {
+        element = fixture('Basic');
+      });
+
+      test('Returns false when no argument', () => {
+        const result = element._computeIsSaved();
+        assert.isFalse(result);
+      });
+
+      test('Returns false when no _id', () => {
+        const result = element._computeIsSaved({_rev: 'test'});
+        assert.isFalse(result);
+      });
+
+      test('Returns false when no _rev', () => {
+        const result = element._computeIsSaved({_id: 'test'});
+        assert.isFalse(result);
+      });
+
+      test('Returns true when _id and _rev', () => {
+        const result = element._computeIsSaved({_id: 'test', _rev: 'test'});
+        assert.isTrue(result);
       });
     });
     </script>

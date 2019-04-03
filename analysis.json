@@ -2,9 +2,9 @@
   "schema_version": "1.0.0",
   "elements": [
     {
-      "description": "Details applet for saved request object.\n\nIf the request is a history item the set `isHistory` property to `true`.\n\nThe applet doesn't support data edit. Element / app hosting this element\nmust handle events sent by this element and support edit action.\n\n### Example\n\n```html\n<saved-request-detail request=\"{...}\"></saved-request-detail>\n```\n\n### Styling\n\n`<saved-request-detail>` provides the following custom properties and\nmixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-detail` | Mixin applied to the element | `{}`\n`--saved-request-detail-color` | Color of the element | `inherit`\n`--saved-request-detail-background-color` | Background color of the element | `inherit`\n`--saved-request-detail-padding` | Padding of the element. | ``\n`--saved-request-detail-description` | Mixin applied to request description | `{}`\n`--saved-request-detail-description-max-width` | Max width of the description element | `700px`\n`--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`\n`--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`\n`--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`\n`--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`\n`--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`\n`--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`\n`--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`\n`--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`\n`--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`\n`--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`\n`--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,\n`--saved-request-detail-action-button-color` | Color of action button | `--primary-color`\n`--saved-request-detail-action-button-background-color` | Background color of action button | ``",
+      "description": "Details applet for saved request object.\n\nIf the request is a history item the set `isHistory` property to `true`.\n\nThe applet doesn't support data edit. Element / app hosting this element\nmust handle events sent by this element and support edit action.\n\n### Example\n\n```html\n<saved-request-detail request=\"{...}\"></saved-request-detail>\n```\n\n### Styling\n\n`<saved-request-detail>` provides the following custom properties and\nmixins for styling:\n\nCustom property | Description | Default\n----------------|-------------|----------\n`--saved-request-detail-color` | Color of the element | `inherit`\n`--saved-request-detail-background-color` | Background color of the element | `inherit`\n`--saved-request-detail-padding` | Padding of the element. | ``\n`--saved-request-detail-description-max-width` | Max width of the description element | `700px`\n`--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`\n`--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`\n`--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,\n`--saved-request-detail-action-button-color` | Color of action button | `--primary-color`\n`--saved-request-detail-action-button-background-color` | Background color of action button | ``",
       "summary": "",
-      "path": "saved-request-detail.html",
+      "path": "saved-request-detail.js",
       "properties": [
         {
           "name": "request",
@@ -13,12 +13,12 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 252,
-              "column": 8
+              "line": 244,
+              "column": 6
             },
             "end": {
-              "line": 255,
-              "column": 9
+              "line": 247,
+              "column": 7
             }
           },
           "metadata": {
@@ -35,12 +35,12 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 257,
-              "column": 8
+              "line": 249,
+              "column": 6
             },
             "end": {
-              "line": 260,
-              "column": 9
+              "line": 252,
+              "column": 7
             }
           },
           "metadata": {
@@ -57,12 +57,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 265,
-              "column": 8
+              "line": 257,
+              "column": 6
             },
             "end": {
-              "line": 265,
-              "column": 24
+              "line": 257,
+              "column": 22
             }
           },
           "metadata": {
@@ -78,12 +78,12 @@
           "privacy": "public",
           "sourceRange": {
             "start": {
-              "line": 272,
-              "column": 8
+              "line": 264,
+              "column": 6
             },
             "end": {
-              "line": 276,
-              "column": 9
+              "line": 268,
+              "column": 7
             }
           },
           "metadata": {
@@ -102,12 +102,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 286,
-              "column": 4
+              "line": 278,
+              "column": 2
             },
             "end": {
-              "line": 295,
-              "column": 5
+              "line": 287,
+              "column": 3
             }
           },
           "metadata": {},
@@ -133,12 +133,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 301,
-              "column": 4
+              "line": 293,
+              "column": 2
             },
             "end": {
-              "line": 305,
-              "column": 5
+              "line": 297,
+              "column": 3
             }
           },
           "metadata": {},
@@ -159,12 +159,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 311,
-              "column": 4
+              "line": 303,
+              "column": 2
             },
             "end": {
-              "line": 321,
-              "column": 5
+              "line": 313,
+              "column": 3
             }
           },
           "metadata": {},
@@ -184,12 +184,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 327,
-              "column": 4
+              "line": 319,
+              "column": 2
             },
             "end": {
-              "line": 342,
-              "column": 5
+              "line": 334,
+              "column": 3
             }
           },
           "metadata": {},
@@ -210,12 +210,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 349,
-              "column": 4
+              "line": 341,
+              "column": 2
             },
             "end": {
-              "line": 364,
-              "column": 5
+              "line": 356,
+              "column": 3
             }
           },
           "metadata": {},
@@ -242,12 +242,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 371,
-              "column": 4
+              "line": 363,
+              "column": 2
             },
             "end": {
-              "line": 379,
-              "column": 5
+              "line": 371,
+              "column": 3
             }
           },
           "metadata": {},
@@ -268,12 +268,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 384,
-              "column": 4
+              "line": 376,
+              "column": 2
             },
             "end": {
-              "line": 391,
-              "column": 5
+              "line": 383,
+              "column": 3
             }
           },
           "metadata": {},
@@ -288,12 +288,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 397,
-              "column": 4
+              "line": 389,
+              "column": 2
             },
             "end": {
-              "line": 404,
-              "column": 5
+              "line": 396,
+              "column": 3
             }
           },
           "metadata": {},
@@ -308,12 +308,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 406,
-              "column": 4
+              "line": 398,
+              "column": 2
             },
             "end": {
-              "line": 411,
-              "column": 5
+              "line": 403,
+              "column": 3
             }
           },
           "metadata": {},
@@ -332,12 +332,12 @@
           "privacy": "protected",
           "sourceRange": {
             "start": {
-              "line": 417,
-              "column": 4
+              "line": 409,
+              "column": 2
             },
             "end": {
-              "line": 422,
-              "column": 5
+              "line": 414,
+              "column": 3
             }
           },
           "metadata": {},
@@ -364,12 +364,12 @@
       "metadata": {},
       "sourceRange": {
         "start": {
-          "line": 246,
-          "column": 2
+          "line": 63,
+          "column": 0
         },
         "end": {
-          "line": 448,
-          "column": 3
+          "line": 440,
+          "column": 1
         }
       },
       "privacy": "public",
@@ -381,12 +381,12 @@
           "description": "Request object to render.",
           "sourceRange": {
             "start": {
-              "line": 252,
-              "column": 8
+              "line": 244,
+              "column": 6
             },
             "end": {
-              "line": 255,
-              "column": 9
+              "line": 247,
+              "column": 7
             }
           },
           "metadata": {},
@@ -397,12 +397,12 @@
           "description": "True if current item represent a history item.",
           "sourceRange": {
             "start": {
-              "line": 257,
-              "column": 8
+              "line": 249,
+              "column": 6
             },
             "end": {
-              "line": 260,
-              "column": 9
+              "line": 252,
+              "column": 7
             }
           },
           "metadata": {},
@@ -413,12 +413,12 @@
           "description": "Computed value, true if the request has been saved in the data store\nwhether it's saved or history.\nBecause request object can have `_id` generated before saving it to\nthe store this relays on checking both `_id` and `_rev`",
           "sourceRange": {
             "start": {
-              "line": 272,
-              "column": 8
+              "line": 264,
+              "column": 6
             },
             "end": {
-              "line": 276,
-              "column": 9
+              "line": 268,
+              "column": 7
             }
           },
           "metadata": {},

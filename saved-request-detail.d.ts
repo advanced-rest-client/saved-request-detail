@@ -5,26 +5,12 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   saved-request-detail.html
+ *   saved-request-detail.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
-
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../polymer/types/lib/utils/render-status.d.ts" />
-/// <reference path="../http-method-label/http-method-label.d.ts" />
-/// <reference path="../date-time/date-time.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../iron-icon/iron-icon.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../iron-resizable-behavior/iron-resizable-behavior.d.ts" />
-/// <reference path="../marked-element/marked-element.d.ts" />
-/// <reference path="../markdown-styles/markdown-styles.d.ts" />
-/// <reference path="../paper-chip/paper-chip.d.ts" />
 
 declare namespace UiElements {
 
@@ -49,21 +35,11 @@ declare namespace UiElements {
    *
    * Custom property | Description | Default
    * ----------------|-------------|----------
-   * `--saved-request-detail` | Mixin applied to the element | `{}`
    * `--saved-request-detail-color` | Color of the element | `inherit`
    * `--saved-request-detail-background-color` | Background color of the element | `inherit`
    * `--saved-request-detail-padding` | Padding of the element. | ``
-   * `--saved-request-detail-description` | Mixin applied to request description | `{}`
    * `--saved-request-detail-description-max-width` | Max width of the description element | `700px`
    * `--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`
-   * `--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
-   * `--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
-   * `--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
-   * `--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`
-   * `--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`
-   * `--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
-   * `--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
-   * `--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
    * `--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`
    * `--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,
    * `--saved-request-detail-action-button-color` | Color of action button | `--primary-color`
@@ -163,6 +139,11 @@ declare namespace UiElements {
   }
 }
 
-interface HTMLElementTagNameMap {
-  "saved-request-detail": UiElements.SavedRequestDetail;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "saved-request-detail": UiElements.SavedRequestDetail;
+  }
 }
+
+export {};

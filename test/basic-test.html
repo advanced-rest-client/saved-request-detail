@@ -3,12 +3,13 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../../arc-models/project-model.html">
-    <link rel="import" href="../../arc-models/request-model.html">
-    <link rel="import" href="../../arc-data-generator/arc-data-generator.html">
-    <link rel="import" href="../saved-request-detail.html">
+
+    <script src="../../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../../../@polymer/test-fixture/test-fixture.js"></script>
+    <script src="../../../mocha/mocha.js"></script>
+    <script src="../../../chai/chai.js"></script>
+    <script src="../../../wct-mocha/wct-mocha.js"></script>
+
   </head>
   <body>
     <project-model></project-model>
@@ -20,8 +21,14 @@
       </template>
     </test-fixture>
 
-    <script>
-    /* global DataGenerator, PouchDB */
+    <script type="module">
+    import '../../../@advanced-rest-client/arc-models/project-model.js';
+    import '../../../@advanced-rest-client/arc-models/request-model.js';
+    import {DataGenerator} from '../../../@advanced-rest-client/arc-data-generator/arc-data-generator.js';
+    import '../../../pouchdb/dist/pouchdb.js';
+    import '../saved-request-detail.js';
+    import sinon from '../../../sinon/pkg/sinon-esm.js';
+    /* global PouchDB */
     suite('basic', function() {
       let project;
       suiteSetup(function() {
@@ -328,6 +335,5 @@
       });
     });
     </script>
-
   </body>
 </html>

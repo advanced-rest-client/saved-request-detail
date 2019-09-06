@@ -3,7 +3,8 @@
   "description": "Details applet for saved request object",
   "version": "3.0.0",
   "license": "Apache-2.0",
-  "main": "saved-request-detail.js",
+  "main": "index.js",
+  "module": "index.js",
   "keywords": [
     "advanced-rest-client",
     "request",

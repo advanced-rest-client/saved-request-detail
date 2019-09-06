@@ -12,12 +12,10 @@ Details applet for saved request object.
 ## Example:
 
 ```html
-<saved-request-detail request='{"method":"GET","name":"Demo request","legacyProject":"A project (collection)","url":"https://api.domain.com/endpoint","created":1532573782247}'></saved-request-detail>
+<saved-request-detail
+  request='{"method":"GET","name":"Demo request","legacyProject":"some-id","url":"https://api.domain.com/endpoint","created":1532573782247}'
+></saved-request-detail>
 ```
-
-## API components
-
-This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)
 
 ## Usage
 
@@ -26,54 +24,52 @@ This components is a part of [API components ecosystem](https://elements.advance
 npm install --save @advanced-rest-client/saved-request-detail
 ```
 
-### In an html file
-
-```html
-<html>
-  <head>
-    <script type="module">
-      import './node_modules/@advanced-rest-client/saved-request-detail/saved-request-detail.js';
-    </script>
-  </head>
-  <body>
-    <saved-request-detail></saved-request-detail>
-  </body>
-</html>
-```
-
-### In a Polymer 3 element
+### In a LitElement
 
 ```js
-import {PolymerElement, html} from './node_modules/@polymer/polymer/polymer-element.js';
+import { LitElement, html } from 'lit-element';
 import './node_modules/@advanced-rest-client/saved-request-detail/saved-request-detail.js';
 
-class SampleElement extends PolymerElement {
-  static get template() {
+class SampleElement extends LitElement {
+  render() {
     return html`
-    <saved-request-detail></saved-request-detail>
+    <saved-request-detail
+      .request="${this.request}"
+      @edit-request="${this._onEdit}"
+      @delete-request="${this._onDelete}"
+      @navigate="${this._onNavigate}"></saved-request-detail>
     `;
+  }
+
+  _onEdit() {
+    ...
+  }
+
+  _onDelete() {
+    ...
+  }
+
+  _onNavigate() {
+    ...
   }
 }
 customElements.define('sample-element', SampleElement);
 ```
 
-### Installation
+## Development
 
 ```sh
 git clone https://github.com/advanced-rest-client/saved-request-detail
-cd api-url-editor
+cd saved-request-detail
 npm install
-npm install -g polymer-cli
-```
-
-### Running the demo locally
-
-```sh
-polymer serve --npm
-open http://127.0.0.1:<port>/demo/
 ```
 
 ### Running the tests
+
 ```sh
-polymer test --npm
+npm test
 ```
+
+## API components
+
+This components is a part of [API components ecosystem](https://elements.advancedrestclient.com/)

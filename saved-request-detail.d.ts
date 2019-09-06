@@ -12,12 +12,14 @@
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
+import {LitElement, html, css} from 'lit-element';
+
+import {ArcResizableMixin} from '@advanced-rest-client/arc-resizable-mixin/arc-resizable-mixin.js';
+
 declare namespace UiElements {
 
   /**
    * Details applet for saved request object.
-   *
-   * If the request is a history item the set `isHistory` property to `true`.
    *
    * The applet doesn't support data edit. Element / app hosting this element
    * must handle events sent by this element and support edit action.
@@ -55,43 +57,42 @@ declare namespace UiElements {
     request: object|null|undefined;
 
     /**
-     * True if current item represent a history item.
+     * Computed value, true if the request has been saved in the data store
+     * whether it's saved or history.
+     * Because request object can have `_id` generated before saving it to
+     * the store this relays on checking both `_id` and `_rev`
+     *    
      */
-    isHistory: boolean|null|undefined;
+    readonly _isSaved: any;
+    readonly projectModel: any;
+
+    /**
+     * Enables compatibility with Anypoint platform
+     */
+    compatibility: boolean|null|undefined;
 
     /**
      * Projects data associated with the request.
      */
     _projects: Array<object|null>|null;
-
-    /**
-     * Computed value, true if the request has been saved in the data store
-     * whether it's saved or history.
-     * Because request object can have `_id` generated before saving it to
-     * the store this relays on checking both `_id` and `_rev`
-     */
-    readonly isSaved: boolean|null|undefined;
-
-    /**
-     * Dispatches bubbling and composed custom event.
-     * By default the event is cancelable until `cancelable` property is set to false.
-     *
-     * @param type Event type
-     * @param detail A detail to set
-     */
-    _dispatch(type: String|null, detail: any|null): CustomEvent|null;
-
-    /**
-     * Disaptches `project-model-query` custom event.
-     *
-     * @param keys List of project IDs to retreive.
-     */
-    _disaptchQueryModel(keys: Array<String|null>|null): CustomEvent|null;
+    _titleTemplate(request: any): any;
+    _addressTemplate(request: any): any;
+    _descriptionTemplate(request: any): any;
+    _timeTemplate(label: any, value: any, other: any): any;
+    _driveTemplate(request: any): any;
+    _projectsTemplate(): any;
+    _deleteButtonTemplate(): any;
+    _actionsTemplate(): any;
+    _modelTemplate(): any;
+    render(): any;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    firstUpdated(): void;
 
     /**
      * Sets project data when `request` object change.
      */
-    _requestChanged(request: object|null): void;
+    _requestChanged(request: object|null): any;
 
     /**
      * Reads related project data.
@@ -111,10 +112,8 @@ declare namespace UiElements {
 
     /**
      * Sends `navigate` event set to current read project.
-     *
-     * @returns Sent `navigate` event
      */
-    _openProject(e: ClickEvent|null): CustomEvent|null;
+    _openProject(e: ClickEvent|null): void;
 
     /**
      * Sends non-bubbling `delete-request` event to the parent element to perform
@@ -127,15 +126,6 @@ declare namespace UiElements {
      * edit action.
      */
     _editRequest(): void;
-    _computeHasUpdated(updated: any, created: any): any;
-
-    /**
-     * Computes value for `isSaved` property.
-     *
-     * @param request Passed request object
-     * @returns True if request has both `_id` and `_rev`.
-     */
-    _computeIsSaved(request: object|null): Boolean|null;
   }
 }
 
@@ -145,5 +135,3 @@ declare global {
     "saved-request-detail": UiElements.SavedRequestDetail;
   }
 }
-
-export {};

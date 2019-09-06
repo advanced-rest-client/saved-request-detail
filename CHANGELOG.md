@@ -54,3 +54,7 @@
 
 
 
+## [3.0.1](https://github.com/advanced-rest-client/saved-request-detail/compare/0.1.2...3.0.1) (2019-09-06)
+
+
+

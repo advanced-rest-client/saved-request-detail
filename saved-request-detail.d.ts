@@ -5,33 +5,21 @@
  *   https://github.com/Polymer/tools/tree/master/packages/gen-typescript-declarations
  *
  * To modify these typings, edit the source file(s):
- *   saved-request-detail.html
+ *   saved-request-detail.js
  */
 
 
 // tslint:disable:variable-name Describing an API that's defined elsewhere.
 // tslint:disable:no-any describes the API as best we are able today
 
-/// <reference path="../polymer/types/polymer-element.d.ts" />
-/// <reference path="../polymer/types/lib/legacy/class.d.ts" />
-/// <reference path="../polymer/types/lib/utils/render-status.d.ts" />
-/// <reference path="../http-method-label/http-method-label.d.ts" />
-/// <reference path="../date-time/date-time.d.ts" />
-/// <reference path="../arc-icons/arc-icons.d.ts" />
-/// <reference path="../paper-button/paper-button.d.ts" />
-/// <reference path="../iron-icon/iron-icon.d.ts" />
-/// <reference path="../iron-flex-layout/iron-flex-layout.d.ts" />
-/// <reference path="../iron-resizable-behavior/iron-resizable-behavior.d.ts" />
-/// <reference path="../marked-element/marked-element.d.ts" />
-/// <reference path="../markdown-styles/markdown-styles.d.ts" />
-/// <reference path="../paper-chip/paper-chip.d.ts" />
+import {LitElement, html, css} from 'lit-element';
+
+import {ArcResizableMixin} from '@advanced-rest-client/arc-resizable-mixin/arc-resizable-mixin.js';
 
 declare namespace UiElements {
 
   /**
    * Details applet for saved request object.
-   *
-   * If the request is a history item the set `isHistory` property to `true`.
    *
    * The applet doesn't support data edit. Element / app hosting this element
    * must handle events sent by this element and support edit action.
@@ -49,21 +37,11 @@ declare namespace UiElements {
    *
    * Custom property | Description | Default
    * ----------------|-------------|----------
-   * `--saved-request-detail` | Mixin applied to the element | `{}`
    * `--saved-request-detail-color` | Color of the element | `inherit`
    * `--saved-request-detail-background-color` | Background color of the element | `inherit`
    * `--saved-request-detail-padding` | Padding of the element. | ``
-   * `--saved-request-detail-description` | Mixin applied to request description | `{}`
    * `--saved-request-detail-description-max-width` | Max width of the description element | `700px`
    * `--saved-request-detail-description-color` | Color of the request description | `rgba(0, 0, 0, 0.64)`
-   * `--saved-request-detail-url-label` | Mixin applied to the  URL label | `{}`
-   * `--saved-request-detail-method-label` | Mixin applied to the `http-method-label` element | `{}`
-   * `--saved-request-detail-meta-row` | Mixin applied to the meta data list items | `{}`
-   * `--saved-request-detail-meta-row-label` | Mixin applied to the meta data label | `{}`
-   * `--saved-request-detail-meta-row-value` | Mixin applied to the meta data value | `{}`
-   * `--saved-request-detail-actions-container` | Mixin applied to the buttons container | `{}`
-   * `--saved-request-detail-action-buttons` | Mixin applied to the action buttons | `{}`
-   * `--saved-request-detail-action-icon` | Mixin applied to action buttons icons  | `{}`
    * `--saved-request-detail-action-icon-color` | Color of the icon in the action button | `rgba(0, 0, 0, 0.54)`
    * `--saved-request-detail-data-list-color` | Color of propery items | `rgba(0, 0, 0, 0.87)`,
    * `--saved-request-detail-action-button-color` | Color of action button | `--primary-color`
@@ -79,43 +57,42 @@ declare namespace UiElements {
     request: object|null|undefined;
 
     /**
-     * True if current item represent a history item.
+     * Computed value, true if the request has been saved in the data store
+     * whether it's saved or history.
+     * Because request object can have `_id` generated before saving it to
+     * the store this relays on checking both `_id` and `_rev`
+     *    
      */
-    isHistory: boolean|null|undefined;
+    readonly _isSaved: any;
+    readonly projectModel: any;
+
+    /**
+     * Enables compatibility with Anypoint platform
+     */
+    compatibility: boolean|null|undefined;
 
     /**
      * Projects data associated with the request.
      */
     _projects: Array<object|null>|null;
-
-    /**
-     * Computed value, true if the request has been saved in the data store
-     * whether it's saved or history.
-     * Because request object can have `_id` generated before saving it to
-     * the store this relays on checking both `_id` and `_rev`
-     */
-    readonly isSaved: boolean|null|undefined;
-
-    /**
-     * Dispatches bubbling and composed custom event.
-     * By default the event is cancelable until `cancelable` property is set to false.
-     *
-     * @param type Event type
-     * @param detail A detail to set
-     */
-    _dispatch(type: String|null, detail: any|null): CustomEvent|null;
-
-    /**
-     * Disaptches `project-model-query` custom event.
-     *
-     * @param keys List of project IDs to retreive.
-     */
-    _disaptchQueryModel(keys: Array<String|null>|null): CustomEvent|null;
+    _titleTemplate(request: any): any;
+    _addressTemplate(request: any): any;
+    _descriptionTemplate(request: any): any;
+    _timeTemplate(label: any, value: any, other: any): any;
+    _driveTemplate(request: any): any;
+    _projectsTemplate(): any;
+    _deleteButtonTemplate(): any;
+    _actionsTemplate(): any;
+    _modelTemplate(): any;
+    render(): any;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    firstUpdated(): void;
 
     /**
      * Sets project data when `request` object change.
      */
-    _requestChanged(request: object|null): void;
+    _requestChanged(request: object|null): any;
 
     /**
      * Reads related project data.
@@ -135,10 +112,8 @@ declare namespace UiElements {
 
     /**
      * Sends `navigate` event set to current read project.
-     *
-     * @returns Sent `navigate` event
      */
-    _openProject(e: ClickEvent|null): CustomEvent|null;
+    _openProject(e: ClickEvent|null): void;
 
     /**
      * Sends non-bubbling `delete-request` event to the parent element to perform
@@ -151,18 +126,12 @@ declare namespace UiElements {
      * edit action.
      */
     _editRequest(): void;
-    _computeHasUpdated(updated: any, created: any): any;
-
-    /**
-     * Computes value for `isSaved` property.
-     *
-     * @param request Passed request object
-     * @returns True if request has both `_id` and `_rev`.
-     */
-    _computeIsSaved(request: object|null): Boolean|null;
   }
 }
 
-interface HTMLElementTagNameMap {
-  "saved-request-detail": UiElements.SavedRequestDetail;
+declare global {
+
+  interface HTMLElementTagNameMap {
+    "saved-request-detail": UiElements.SavedRequestDetail;
+  }
 }

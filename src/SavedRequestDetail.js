@@ -16,9 +16,8 @@ import { ArcResizableMixin } from '@advanced-rest-client/arc-resizable-mixin/arc
 import markdownStyles from '@advanced-rest-client/markdown-styles/markdown-styles.js';
 import '@api-components/http-method-label/http-method-label.js';
 import '@advanced-rest-client/date-time/date-time.js';
-import '@advanced-rest-client/arc-icons/arc-icons.js';
+import { deleteIcon, edit } from '@advanced-rest-client/arc-icons/ArcIcons.js';
 import '@anypoint-web-components/anypoint-button/anypoint-button.js';
-import '@polymer/iron-icon/iron-icon.js';
 import '@advanced-rest-client/arc-marked/arc-marked.js';
 import '@anypoint-web-components/anypoint-chip/anypoint-chip.js';
 import '@advanced-rest-client/arc-models/project-model.js';
@@ -133,9 +132,12 @@ export class SavedRequestDetail extends ArcResizableMixin(LitElement) {
         padding-right: 12px;
       }
 
-      anypoint-button iron-icon {
+      anypoint-button .icon {
         margin-right: 12px;
-        color: var(--saved-request-detail-action-icon-color, rgba(0, 0, 0, 0.54));
+        fill: var(--saved-request-detail-action-icon-color, rgba(0, 0, 0, 0.54));
+        display: inline-block;
+        width: 24px;
+        height: 24px;
       }
 
       marked-element {
@@ -247,8 +249,9 @@ export class SavedRequestDetail extends ArcResizableMixin(LitElement) {
       data-action="delete-request"
       title="Removes request from the data store"
       aria-label="Activate to remove the request"
-      ?compatibility="${this.compatibility}">
-      <iron-icon icon="arc:delete"></iron-icon>
+      ?compatibility="${this.compatibility}"
+    >
+      <span class="icon">${deleteIcon}</span>
       Delete
     </anypoint-button>`;
   }
@@ -261,8 +264,9 @@ export class SavedRequestDetail extends ArcResizableMixin(LitElement) {
       data-action="edit-request"
       title="Opens request editor"
       aria-label="Activate to edit request"
-      ?compatibility="${this.compatibility}">
-      <iron-icon icon="arc:edit"></iron-icon>
+      ?compatibility="${this.compatibility}"
+    >
+      <span class="icon">${edit}</span>
       Edit
     </anypoint-button>
     `;

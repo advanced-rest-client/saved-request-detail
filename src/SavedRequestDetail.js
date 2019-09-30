@@ -176,7 +176,7 @@ export class SavedRequestDetail extends ArcResizableMixin(LitElement) {
     if (!request.description) {
       return '';
     }
-    return html`<arc-marked markdown="${request.description}">
+    return html`<arc-marked markdown="${request.description}" sanitize>
       <div class="markdown-html markdown-body description"></div>
     </arc-marked>`;
   }

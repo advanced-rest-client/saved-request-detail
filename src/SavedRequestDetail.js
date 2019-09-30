@@ -140,8 +140,9 @@ export class SavedRequestDetail extends ArcResizableMixin(LitElement) {
         height: 24px;
       }
 
-      marked-element {
+      arc-marked {
         margin-top: 20px;
+        padding: 0;
       }
 
       .project-link {
